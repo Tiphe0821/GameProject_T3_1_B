@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 public enum PlayerState
 {
     Normal,
-    Pickup
+    Interact
 }
 
 public class PlayerController : MonoBehaviour
@@ -147,18 +147,18 @@ public class PlayerController : MonoBehaviour
         controller.Move(Vector3.up * verticalVelocity * Time.deltaTime);
     }
 
-    /*
+    
     public void ChangeState(PlayerState newState)
     {
         currentState = newState;
 
         if (currentState != PlayerState.Normal)
         {
-            animator.SetFloat("speed", 0);
+            //animator.SetFloat("speed", 0);
 
         }
 
         Debug.Log("현재 상태 : " + currentState);
     }
-    */
+    
 }

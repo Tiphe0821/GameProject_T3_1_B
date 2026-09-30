@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PickupItem : MonoBehaviour
 {
+    public bool needDelay = false;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -16,7 +18,7 @@ public class PickupItem : MonoBehaviour
 
     public void Collect()
     {
-        Debug.Log("∞≥ »πµÊ");
+        Debug.Log("æ∆¿Ã≈€ »πµÊ");
         Destroy(gameObject);
     }
 }
