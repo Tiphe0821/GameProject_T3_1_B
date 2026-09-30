@@ -37,6 +37,13 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    private void OnInteract(InputValue value)
+    {
+
+    }
+
+    // 눈앞에 들어온 물체 인식 -> 아이템 상호작용 (허준 교수님 코드 참고해보자)
+
 
     // Update is called once per frame
     void Update()
@@ -73,7 +80,7 @@ public class PlayerController : MonoBehaviour
             input.z += 1f;
         if (keyboard.leftCtrlKey.isPressed)
             input.y -= 1f;
-        if(keyboard.leftShiftKey.isPressed)
+        if(keyboard.spaceKey.isPressed)
             input.y += 1f;
             
 
