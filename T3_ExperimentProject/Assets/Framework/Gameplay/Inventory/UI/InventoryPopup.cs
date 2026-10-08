@@ -57,7 +57,7 @@ namespace GameFramework.Gameplay
             var stacks = inv.Stacks;
             int need = Mathf.Max(minSlots, stacks.Count);
 
-            // 슬롯 뷰 확보 (부족하면 템플릿 복제)
+            // 슬롯 뷰 확보 (부족하면 템플릿 복제)        
             while (_views.Count < need)
             {
                 var v = Instantiate(slotTemplate, slotParent);
