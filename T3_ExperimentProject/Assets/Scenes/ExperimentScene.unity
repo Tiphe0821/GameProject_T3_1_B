@@ -1383,7 +1383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d9db569112398a4eabfed5061c79223, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupItem
-  needDelay: 1
+  needDelay: 0
 --- !u!135 &2070291222
 SphereCollider:
   m_ObjectHideFlags: 0

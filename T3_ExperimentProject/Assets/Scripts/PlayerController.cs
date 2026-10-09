@@ -1,5 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using GameFramework.Core;
+using GameFramework.Services;
+using GameFramework.Gameplay;
 
 public enum PlayerState
 {
@@ -62,6 +65,21 @@ public class PlayerController : MonoBehaviour
         if (currentState != PlayerState.Normal) return;
 
         HandleMovement(keyboard);
+
+        if(keyboard.iKey.wasPressedThisFrame || keyboard.tabKey.wasPressedThisFrame)
+        {
+            UIManager.Instance.Toggle<InventoryPopup>("InventoryPopup");
+            if (Cursor.visible == true)
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.None;
+                Cursor.visible = true;
+            }
+        }
 
     }
 

@@ -43,6 +43,12 @@ public class ThirdPersonCamera : MonoBehaviour
             return;
         }
 
+
+        if (Cursor.lockState == CursorLockMode.None)
+        {
+            return;
+        }
+
         Vector2 mouseDelta = mouse.delta.ReadValue();
 
         yaw += mouseDelta.x * mouseSensitivuty;

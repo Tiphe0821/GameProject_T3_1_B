@@ -1,17 +1,13 @@
 using UnityEngine;
+using GameFramework.Core;
+using GameFramework.Services;
+using GameFramework.Gameplay;
 
 public class PickupItem : MonoBehaviour
 {
     public bool needDelay = false;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
+    private void OnEnable()
     {
         
     }
@@ -19,6 +15,11 @@ public class PickupItem : MonoBehaviour
     public void Collect()
     {
         Debug.Log("æ∆¿Ã≈€ »πµÊ");
+        if (!needDelay)
+        {
+            InventoryManager.Instance.AddItem("temp", 1);
+        }
+
         Destroy(gameObject);
     }
 }
