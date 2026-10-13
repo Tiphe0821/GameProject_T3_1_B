@@ -5,12 +5,14 @@ using UnityEngine.InputSystem;
 public class PlayerPickup : MonoBehaviour
 {
     private PlayerController playerController;      // 플레이어 컨트롤러
+    [SerializeField] private Animator animator;                     // 플레이어 애니메이션 재생 & 플레이어를 줍는동안 움직이지 못하게하는게 목적. 
+    [SerializeField] private InteractionUI interactionUI;
 
     [SerializeField] private float detectionRadius = 2f;
     [SerializeField] private float pickupDuration = 1.2f;
     [SerializeField] private float pickupMoment = 0.55f;
 
-    private PickupItem targetItem;
+    private PickupItem targetItem;                                  //  문은 몰라도 상호작용 오브젝트를 추가할 예정
 
     private bool isPickingUp;
 
@@ -34,6 +36,8 @@ public class PlayerPickup : MonoBehaviour
         // Player 주변에서 가장 가까운 아이템을 찾는다
         targetItem = FindClosestItem();
 
+        ShowGuide();
+
         if (targetItem == null) return;
 
         Keyboard keyboard = Keyboard.current;
@@ -43,7 +47,20 @@ public class PlayerPickup : MonoBehaviour
 
         if (keyboard.eKey.wasPressedThisFrame)
         {
-            StartCoroutine(PickupAnimation());
+            Interact();
+        }
+    }
+
+    private void Interact()
+    {
+        StartCoroutine(PickupAnimation());
+    }
+
+    private void ShowGuide()
+    {
+        if (targetItem != null)
+        {
+            interactionUI.ShowGuide("[E] " + targetItem.itemData.name + "줍기");
         }
     }
 

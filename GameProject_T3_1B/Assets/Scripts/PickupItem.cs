@@ -1,24 +1,22 @@
 using UnityEngine;
+using GameFramework.Gameplay;
+using GameFramework.Data;
 
 public class PickupItem : MonoBehaviour
 {
-    public bool needDelay = false;
+    public bool needDelay = false;      // 나중에 오브젝트 상호작용과 나눌 예정
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
+    public ItemData itemData;
 
     public void Collect()
     {
         Debug.Log("아이템 획득");
+
+        if (!needDelay)
+        {
+            InventoryManager.Instance.AddItem(itemData.id, 1);
+        }
+
         Destroy(gameObject);
     }
 }
