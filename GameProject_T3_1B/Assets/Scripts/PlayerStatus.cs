@@ -28,6 +28,7 @@ public class PlayerStatus : MonoBehaviour
     public float CurrentRadiation => currentRadiation;
     public float MaxRadiation => maxRadiation;
 
+    private bool isImmune;
 
     // (현재 값, 최대 값)으로 설정 해두었음.
     public UnityEvent<float, float> onHealthChanged;
@@ -45,6 +46,8 @@ public class PlayerStatus : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        isImmune = false;
     }
 
     private void Start()
@@ -68,6 +71,8 @@ public class PlayerStatus : MonoBehaviour
 
     public void ModifyHealth(float amount)
     {
+        if (isImmune) return;
+
         currentHealth = Mathf.Clamp(currentHealth + amount, 0f, maxHealth);
         onHealthChanged?.Invoke(currentHealth, maxHealth);
 
@@ -79,12 +84,16 @@ public class PlayerStatus : MonoBehaviour
 
     public void ModifyOxygen(float amount)
     {
+        if(isImmune) return;
+
         currentOxygen = Mathf.Clamp(currentOxygen + amount, 0f, maxOxygen);
         onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
     }
 
     public void ModifyRadiation(float amount)
     {
+        if (isImmune) return;   
+
         currentRadiation = Mathf.Clamp(currentRadiation + amount, 0f, maxRadiation);
         onRadiationChanged?.Invoke(currentRadiation, maxRadiation);
     }
@@ -94,6 +103,11 @@ public class PlayerStatus : MonoBehaviour
         onHealthChanged?.Invoke(currentHealth, maxHealth);
         onOxygenChanged?.Invoke(currentOxygen, maxOxygen);
         onRadiationChanged?.Invoke(currentRadiation, maxRadiation);
+    }
+
+    public void OnOffImmunity()
+    {
+        isImmune = !isImmune;
     }
 
     private void HandleDeath()

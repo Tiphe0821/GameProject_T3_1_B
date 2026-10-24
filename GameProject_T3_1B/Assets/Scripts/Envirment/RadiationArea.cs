@@ -5,6 +5,7 @@ public class RadiationArea : MonoBehaviour
 
 
     [SerializeField] private float radiationDamage = 1f;
+    [SerializeField] private float radiationFrequency = 0.7f;
 
     private float lastDamageTime = -999f;
     private bool inRadiation;
@@ -30,7 +31,7 @@ public class RadiationArea : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(inRadiation && lastDamageTime + 0.7f < Time.time)
+        if(inRadiation && lastDamageTime + radiationFrequency < Time.time)
         {
             PlayerStatus.Instance.ModifyRadiation(-1f);
             lastDamageTime = Time.time;

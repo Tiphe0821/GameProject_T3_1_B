@@ -10,6 +10,7 @@ public class CheatEngineManager : MonoBehaviour
     [SerializeField] private Button maxHealthButton;             // 체력 최대치로 회복
     [SerializeField] private Button maxOxygenButton;             // 산소 수치 최대로 회복
     [SerializeField] private Button maxRadiationButton;          // 면역력 최대치로 회복
+    [SerializeField] private Button activateImmunityButton;          // 무적 활성화 키
 
     void Start()
     {
@@ -22,6 +23,9 @@ public class CheatEngineManager : MonoBehaviour
 
         if (maxRadiationButton != null)
             maxRadiationButton.onClick.AddListener(OnClickMaxRadiation);
+
+        if(activateImmunityButton != null)
+            activateImmunityButton.onClick.AddListener(StopStatusChange);
 
         // 게임 시작 시 치트 패널은 기본적으로 꺼두기
         if (cheatPanel != null)
@@ -76,6 +80,6 @@ public class CheatEngineManager : MonoBehaviour
 
     public void StopStatusChange()
     {
-
+        PlayerStatus.Instance.OnOffImmunity();
     }
 }
