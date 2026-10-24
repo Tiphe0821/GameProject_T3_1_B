@@ -8,7 +8,7 @@ public class MeleeAttackTrigger : MonoBehaviour
 
         if (other.CompareTag("Enemy"))
         {
-            other.GetComponent<Health>().TakeDamage(1);
+            other.GetComponent<EnemyHealth>().TakeDamage(1);
         }
     }
 
