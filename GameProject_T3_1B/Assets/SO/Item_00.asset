@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameFramework::GameFramework.Data.ItemData
   id: Dummy
   displayName: "\uB354\uBBF8"
-  description: 
-  icon: {fileID: 0}
+  description: "\uC784\uC2DC \uC0B0\uC18C \uC624\uBE0C\uC81D\uD2B8"
+  icon: {fileID: 21300000, guid: 5d95dc65b5bb33ba4988f07a9ed7c901, type: 3}
   type: 0
   maxStack: 99
