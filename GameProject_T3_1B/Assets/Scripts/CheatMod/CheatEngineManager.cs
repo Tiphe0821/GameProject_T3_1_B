@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class CheatEngineManager : MonoBehaviour
 {
@@ -34,10 +35,15 @@ public class CheatEngineManager : MonoBehaviour
 
     void Update()
     {
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard == null) return;
+
         // 패널 토글 기능 추가 (~ 키나 F1 키를 누르면 치트 패널이 켜지고 꺼짐)
-        if (Input.GetKeyDown(KeyCode.BackQuote) || Input.GetKeyDown(KeyCode.F1))
+        if (keyboard.f1Key.wasPressedThisFrame)
         {
             ToggleCheatPanel();
+
+            
         }
     }
 
