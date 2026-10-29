@@ -59,7 +59,7 @@ public class PlayerStatus : MonoBehaviour
     {
         currentHealth = maxHealth;
         currentOxygen = maxOxygen;
-        currentRadiation = 0f;
+        currentRadiation = maxRadiation;
 
         NotifyUI();
     }
@@ -114,4 +114,5 @@ public class PlayerStatus : MonoBehaviour
     {
         Debug.Log("플레이어 사망 처리");
     }
+
 }
