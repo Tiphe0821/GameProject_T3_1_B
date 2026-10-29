@@ -987,10 +987,12 @@ GameObject:
   - component: {fileID: 528703721}
   - component: {fileID: 528703720}
   - component: {fileID: 528703719}
+  - component: {fileID: 528703723}
+  - component: {fileID: 528703722}
   - component: {fileID: 528703718}
   m_Layer: 0
   m_Name: Door
-  m_TagString: Untagged
+  m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1088,6 +1090,34 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &528703722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528703717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 649134907798b9642b70e42618c5bdb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PickupItem
+  needDelay: 0
+  itemData: {fileID: 0}
+--- !u!114 &528703723
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 528703717}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2820f57c80a4a0468c54f8590a233eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TestSceneDoor
+  targetSceneName: TetherScene
+  interactiveDistance: 10
 --- !u!1 &601386374
 GameObject:
   m_ObjectHideFlags: 0
@@ -1153,8 +1183,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   cameraTransform: {fileID: 956626516}
-  walkSpeed: 3
-  runSpeed: 6
+  walkSpeed: 20
+  runSpeed: 25
   rotationSpeed: 10
   gravity: -20
 --- !u!143 &601386377
