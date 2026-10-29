@@ -1,32 +1,50 @@
 using UnityEngine;
 
-public class DriftingResource : MonoBehaviour
+public class MeterialSpawner : MonoBehaviour
 {
-    [Header("Movement Settings")]
-    [SerializeField] private Vector3 moveDirection = new Vector3(-1f, 0f, 0f);  // 흘러가는 방향
-    [SerializeField] private float moveSpeed = 3f;                              // 이동 속도
-    [SerializeField] private float rotationSpeed = 45f;                         // 회전 속도 (우주 느낌 연출)
-    [SerializeField] private float lifeTime = 20f;                              // 일정 시간 후 자동 소멸 (메모리 관리)
+    [Header("Resource Prefabs")]
+    [SerializeField] private GameObject[] resourcePrefabs; // 소환할 자원 프리팹들 (프리팹들 1단계 자원 4개)
 
-    private void Start()
-    {
-        // 지정된 시간이 지나면 자동으로 파괴 (맵 밖으로 나가서 쌓이는 것 방지)
-        Destroy(gameObject, lifeTime);
-    }
+    [Header("Spawn Settings")]
+    [SerializeField] private float spawnInterval = 4.0f;     // 자원이 생성되는 주기 (초)
+    [SerializeField] private float spawnRadius = 25f;      // 스폰 범위 (함수 주변 넓이)
+    [SerializeField] private bool isSpawning = true;         // 스폰 활성화 여부
+
+    private float timer;
 
     private void Update()
     {
-        //앞으로 흘러가게 이동
-        transform.Translate(moveDirection * moveSpeed * Time.deltaTime, Space.World);
+        if (!isSpawning) return;
 
-        //빙글빙글 돌리는 표류 느낌 주기
-        transform.Rotate(Vector3.up * rotationSpeed * Time.deltaTime);
+        timer += Time.deltaTime;
+
+        // 정해진 주기가 되면 자원 소환
+        if (timer >= spawnInterval)
+        {
+            SpawnMaterial();
+            timer = 0f;
+        }
     }
 
-    // 플레이어가 획득했을 때 호출할 함수
-    public void Collect()
+    private void SpawnMaterial()
     {
-        // 여기에 아이템 획득 효과음이나 인벤토리 추가 로직 연결 (아직 미완이니 수정 해야 함.)
-        Destroy(gameObject);
+        if (resourcePrefabs == null || resourcePrefabs.Length == 0)
+        {
+            Debug.LogWarning("스폰할 자원 프리팹이 등록되지 않았습니다!");
+            return;
+        }
+
+        // 등록된 자원 중 무작위로 하나 선택
+        GameObject selectedPrefab = resourcePrefabs[Random.Range(0, resourcePrefabs.Length)];
+
+        //스포너 주변 무작위 위치 계산 (범위 내)
+        Vector2 randomCircle = Random.insideUnitCircle * spawnRadius;
+        Vector3 spawnPos = transform.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
+
+        // 자원 오브젝트 생성 (이때 이동 스크립트가 알아서 움직임)
+        if (selectedPrefab != null)
+        {
+            Instantiate(selectedPrefab, spawnPos, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
+        }
     }
 }
