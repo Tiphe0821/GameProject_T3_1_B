@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerPickup : MonoBehaviour
 {
@@ -11,8 +12,10 @@ public class PlayerPickup : MonoBehaviour
     [SerializeField] private float detectionRadius = 2f;
     [SerializeField] private float pickupDuration = 1.2f;
     [SerializeField] private float pickupMoment = 0.55f;
+    [SerializeField] private string NextSceneName;
 
     private PickupItem targetItem;                                  //  문은 몰라도 상호작용 오브젝트를 추가할 예정
+    private Door targetDoor;
 
     private bool isPickingUp;
 
@@ -35,6 +38,7 @@ public class PlayerPickup : MonoBehaviour
 
         // Player 주변에서 가장 가까운 아이템을 찾는다
         targetItem = FindClosestItem();
+        targetDoor = FindClosestDoor();
 
         ShowGuide();
 
@@ -51,9 +55,22 @@ public class PlayerPickup : MonoBehaviour
         }
     }
 
+    private void ChangeScene()
+    {
+        SceneManager.LoadScene(NextSceneName);
+    }
+
+
     private void Interact()
     {
-        StartCoroutine(PickupAnimation());
+        if (targetDoor != null)
+        {
+            ChangeScene();
+        }
+        if (targetItem != null)
+        {
+            StartCoroutine(PickupAnimation());
+        }
     }
 
     private void ShowGuide()
@@ -85,6 +102,28 @@ public class PlayerPickup : MonoBehaviour
         }
 
         return closestItem;
+    }
+    private Door FindClosestDoor()
+    {
+        Collider[] colliders = Physics.OverlapSphere(transform.position, detectionRadius, ~0, QueryTriggerInteraction.Collide);
+        Door closestDoor = null;
+        float closestDistance = Mathf.Infinity;
+
+        foreach (Collider itemCollider in colliders)
+        {
+            Door door = itemCollider.GetComponentInParent<Door>();
+
+            if (door == null) continue;
+            float distance = Vector3.Distance(transform.position, door.transform.position);
+
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestDoor = door;
+            }
+        }
+
+        return closestDoor;
     }
 
     private IEnumerator PickupAnimation()
