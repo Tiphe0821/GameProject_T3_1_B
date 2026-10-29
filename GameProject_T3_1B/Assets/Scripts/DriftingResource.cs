@@ -4,9 +4,9 @@ public class DriftingResource : MonoBehaviour
 {
     [Header("Movement Settings")]
     [SerializeField] private Vector3 moveDirection = new Vector3(-1f, 0f, 0f);  // 흘러가는 방향
-    [SerializeField] private float moveSpeed = 3f;                              // 이동 속도
+    [SerializeField] private float moveSpeed = 10f;                              // 이동 속도
     [SerializeField] private float rotationSpeed = 45f;                         // 회전 속도 (우주 느낌 연출)
-    [SerializeField] private float lifeTime = 20f;                              // 일정 시간 후 자동 소멸 (메모리 관리)
+    [SerializeField] private float lifeTime = 30f;                              // 일정 시간 후 자동 소멸 (메모리 관리)
 
     private void Start()
     {
