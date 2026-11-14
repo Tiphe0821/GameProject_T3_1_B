@@ -2022,17 +2022,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AgentManager
   allAgents:
   - agentName: Agent
-    agentIcon: {fileID: 4895802684607180572, guid: aba357a377b613145bb27fcd7764d71b, type: 3}
+    agentIcon: {fileID: 4895802684607180572, guid: 410af906fc8c01543985f55e48f1b03d, type: 3}
     maxHealth: 0
     maxOxygen: 0
     moveSpeed: 0
   - agentName: Cryptographer
-    agentIcon: {fileID: 5166243855303422729, guid: b86ab3231cfe34c40afdf20da9375ac0, type: 3}
+    agentIcon: {fileID: 5166243855303422729, guid: 0438c89cf661efe4f82ed28e71aacb84, type: 3}
     maxHealth: 0
     maxOxygen: 0
     moveSpeed: 0
   - agentName: Engineer
-    agentIcon: {fileID: 1595982907714843850, guid: d6ef3177de9ea324998a220d7ad6f556, type: 3}
+    agentIcon: {fileID: 1595982907714843850, guid: 05093c347aad8764c8ff05fc33f1221e, type: 3}
     maxHealth: 0
     maxOxygen: 0
     moveSpeed: 0
