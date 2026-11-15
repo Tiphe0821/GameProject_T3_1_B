@@ -7,7 +7,7 @@ public class AgentData
     public string agentName;
     public Sprite agentIcon;       
     
-    [Header("Agent Stats")]
+    [Header("요원 별 능력치")]
     public float maxHealth;        
     public float maxOxygen;        
     public float moveSpeed;        
@@ -15,20 +15,36 @@ public class AgentData
 
 public class AgentManager : MonoBehaviour
 {
-    public static AgentManager Instance { get; private set; }
+    private static AgentManager instance;
+    public static AgentManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindFirstObjectByType<AgentManager>();
+                if (instance == null)
+                {
+                    GameObject obj = new GameObject("AgentManager");
+                    instance = obj.AddComponent<AgentManager>();
+                }
+            }
+            return instance;
+        }
+    }
 
     [Header("Agent Settings")]
-    public List<AgentData> allAgents = new List<AgentData>();
+    public List<AgentData> allAgents = new List<AgentData>(); 
     public int currentAgentIndex { get; private set; } = 0; 
 
     private void Awake()
     {
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
+            instance = this;
             DontDestroyOnLoad(gameObject); 
         }
-        else
+        else if (instance != this)
         {
             Destroy(gameObject);
         }
@@ -60,12 +76,7 @@ public class AgentManager : MonoBehaviour
         {
             currentAgentIndex = newIndex;
             AgentData newAgent = allAgents[newIndex];
-
-            if (PlayerStatus.Instance != null)
-            {
-                // PlayerStatus.Instance.maxHealth = newAgent.maxHealth;
-                Debug.Log($"[AgentManager] {newAgent.agentName}(으)로 직업 변경 완료!");
-            }
+            Debug.Log($"[AgentManager] {newAgent.agentName}(으)로 직업 변경 완료!");
         }
     }
 }
