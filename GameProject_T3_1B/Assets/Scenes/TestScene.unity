@@ -1369,11 +1369,10 @@ GameObject:
   m_Component:
   - component: {fileID: 601386381}
   - component: {fileID: 601386378}
-  - component: {fileID: 601386377}
-  - component: {fileID: 601386376}
   - component: {fileID: 601386375}
   - component: {fileID: 601386382}
   - component: {fileID: 601386383}
+  - component: {fileID: 601386384}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1411,49 +1410,6 @@ MonoBehaviour:
   m_DefaultActionMap: 
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &601386376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 601386374}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1bdae4784975f4141a9cc3f3b00a6f36, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  animator: {fileID: 1786462677}
-  cameraTransform: {fileID: 956626516}
-  walkSpeed: 20
-  runSpeed: 25
-  rotationSpeed: 10
-  gravity: -20
---- !u!143 &601386377
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 601386374}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 5.36
-  m_Radius: 1.07
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1.53, z: 0}
 --- !u!136 &601386378
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1471,7 +1427,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Radius: 1.3
   m_Height: 6
@@ -1535,6 +1491,29 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &601386384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 601386374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bee4419a4181fd945b001b712a0e18d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GravityPlayerController
+  animator: {fileID: 1786462677}
+  cameraTransform: {fileID: 956626516}
+  walkSpeed: 20
+  runSpeed: 25
+  rotationSpeed: 10
+  jumpHeight: 2
+  gravityMultiplier: 2
+  groundCheckDistance: 0.15
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1001 &640376960
 PrefabInstance:
   m_ObjectHideFlags: 0

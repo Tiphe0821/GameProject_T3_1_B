@@ -1,0 +1,208 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+// PlayerState 열거형은 PlayerController.cs 안에 이미 있어서 여기서는 다시 만들지 않는다.
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(CapsuleCollider))]
+public class GravityPlayerController : MonoBehaviour
+{
+    [SerializeField] private Animator animator;
+
+    [SerializeField] private Transform cameraTransform;
+
+    [Header("이동 설정")]
+
+    [SerializeField] private float walkSpeed = 2f;
+    [SerializeField] private float runSpeed = 5f;
+
+    [SerializeField] private float rotationSpeed = 10f;
+
+    [Header("점프 / 중력 설정")]
+
+    [SerializeField] private float jumpHeight = 2f;             // 점프 높이 (월드 단위)
+    [SerializeField] private float gravityMultiplier = 2f;      // 중력 배율 (클수록 빨리 떨어진다)
+    [SerializeField] private float groundCheckDistance = 0.15f; // 발 밑 바닥 감지 거리
+    [SerializeField] private LayerMask groundLayers = ~0;       // 바닥으로 인식할 레이어 (기본: 전부)
+
+    private Rigidbody rb;
+    private CapsuleCollider capsule;
+
+    private PlayerState currentState = PlayerState.Normal;
+
+    private Vector3 moveDirection;
+    private bool isRunning;
+    private bool jumpRequested;
+    private bool isGrounded;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        capsule = GetComponent<CapsuleCollider>();
+
+        // 리지드바디 기본 설정
+        rb.useGravity = true;                                       // 리지드바디 중력 사용
+        rb.constraints = RigidbodyConstraints.FreezeRotation;       // 캐릭터가 넘어지지 않게 회전 고정
+        rb.interpolation = RigidbodyInterpolation.Interpolate;      // 움직임을 부드럽게
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+        // Inspector에 프리팹 원본이 들어가 있어도 문제없도록,
+        // 항상 씬에 있는 자식 오브젝트의 Animator를 찾아서 사용한다.
+        animator = GetComponentInChildren<Animator>();
+
+        if (animator == null)
+        {
+            Debug.LogError("GravityPlayerController: 자식에서 Animator를 찾지 못했어요! 모델(Astraveler_Hu)이 Player 아래에 있는지 확인해주세요.");
+        }
+
+        if (cameraTransform == null)
+        {
+            Debug.LogError("GravityPlayerController: cameraTransform이 비어 있어요! 인스펙터에서 카메라를 연결해주세요.");
+        }
+    }
+
+    private void OnInteract(InputValue value)
+    {
+
+    }
+
+    // 입력은 Update에서 받는다
+    private void Update()
+    {
+        Keyboard keyboard = Keyboard.current;
+
+        if (keyboard == null)
+        {
+            return;
+        }
+
+        if (currentState == PlayerState.Normal)
+        {
+            HandleInput(keyboard);
+        }
+        else
+        {
+            // Normal 상태가 아니라면 이동 입력을 받지 않는다
+            moveDirection = Vector3.zero;
+            isRunning = false;
+            jumpRequested = false;
+        }
+
+        UpdateAnimation();
+    }
+
+    // 물리 이동은 FixedUpdate에서 한다
+    private void FixedUpdate()
+    {
+        CheckGround();
+
+        Vector3 velocity = rb.linearVelocity;
+
+        // 수평 이동 (위/아래 속도는 중력과 점프가 담당한다)
+        float currentSpeed = isRunning ? runSpeed : walkSpeed;
+        Vector3 horizontal = moveDirection * currentSpeed;
+        velocity.x = horizontal.x;
+        velocity.z = horizontal.z;
+
+        // 점프: 바닥에 있을 때만
+        if (jumpRequested && isGrounded)
+        {
+            float gravityForce = -Physics.gravity.y * gravityMultiplier;
+            velocity.y = Mathf.Sqrt(2f * jumpHeight * gravityForce);
+        }
+        jumpRequested = false;
+
+        rb.linearVelocity = velocity;
+
+        // 중력을 더 세게 (기본 중력에 추가로 힘을 준다)
+        if (gravityMultiplier > 1f)
+        {
+            rb.AddForce(Physics.gravity * (gravityMultiplier - 1f), ForceMode.Acceleration);
+        }
+
+        // 회전은 수평 방향만 사용
+        Vector3 flatDirection = new Vector3(moveDirection.x, 0f, moveDirection.z);
+
+        if (flatDirection.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(flatDirection);
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
+        }
+    }
+
+    private void HandleInput(Keyboard keyboard)
+    {
+        if (cameraTransform == null) return;
+
+        // 1. 입력 구현 (상하 이동 Space / Ctrl 은 삭제했다)
+        Vector3 input = Vector3.zero;
+
+        if (keyboard.aKey.isPressed)
+            input.x -= 1f;
+        if (keyboard.dKey.isPressed)
+            input.x += 1f;
+        if (keyboard.sKey.isPressed)
+            input.z -= 1f;
+        if (keyboard.wKey.isPressed)
+            input.z += 1f;
+
+        input = Vector3.ClampMagnitude(input, 1f);
+
+        // 카메라가 바라보는 방향 기준으로 수평 방향만 뽑기
+        Vector3 cameraForward = cameraTransform.forward;
+        Vector3 cameraRight = cameraTransform.right;
+
+        cameraForward.y = 0;
+        cameraRight.y = 0;
+
+        cameraForward.Normalize();
+        cameraRight.Normalize();
+
+        moveDirection = cameraForward * input.z + cameraRight * input.x;
+        moveDirection = Vector3.ClampMagnitude(moveDirection, 1f);
+
+        isRunning = keyboard.leftShiftKey.isPressed;
+
+        // 점프 입력 (Space)
+        if (keyboard.spaceKey.wasPressedThisFrame)
+        {
+            jumpRequested = true;
+        }
+    }
+
+    private void CheckGround()
+    {
+        // 캡슐 중심에서 아래로 레이를 쏜다 (자기 자신의 콜라이더 안에서 시작하면 자기 자신은 맞지 않는다)
+        Bounds bounds = capsule.bounds;
+        float distance = bounds.extents.y + groundCheckDistance;
+
+        isGrounded = Physics.Raycast(
+            bounds.center,
+            Vector3.down,
+            distance,
+            groundLayers,
+            QueryTriggerInteraction.Ignore);
+    }
+
+    private void UpdateAnimation()
+    {
+        if (animator == null) return;
+
+        //8. Idle, Walk, Run 애니메이션
+        float animationSpeed = 0f;
+
+        if (moveDirection.sqrMagnitude > 0.001f)
+        {
+            animationSpeed = isRunning ? 1f : 0.5f;
+        }
+
+        animator.SetFloat("speed", animationSpeed, 0.1f, Time.deltaTime);
+    }
+
+    public void ChangeState(PlayerState newState)
+    {
+        currentState = newState;
+
+        Debug.Log("현재 상태 : " + currentState);
+    }
+
+}
