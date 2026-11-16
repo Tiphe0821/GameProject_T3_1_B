@@ -7,9 +7,10 @@ public enum PlayerState
     Interact
 }
 
+[RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    // [SerializeField] private Animator animator;
+    [SerializeField] private Animator animator;
 
     [SerializeField] private Transform cameraTransform;
 
@@ -29,6 +30,11 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
+
+        if (cameraTransform == null)
+        {
+            Debug.LogError("PlayerController: cameraTransform이 비어 있어요! 인스펙터에서 카메라를 연결해주세요.");
+        }
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -67,6 +73,8 @@ public class PlayerController : MonoBehaviour
 
     private void HandleMovement(Keyboard keyboard)      // On 대신 쓰이는 것
     {
+        if (cameraTransform == null) return;
+
         // 1. 입력 구현
         Vector3 input = Vector3.zero;
 
@@ -86,40 +94,46 @@ public class PlayerController : MonoBehaviour
 
         input = Vector3.ClampMagnitude(input, 1f);
 
+        // 카메라가 바라보는 방향 기준으로 수평 방향만 뽑기
         Vector3 cameraForward = cameraTransform.forward;
         Vector3 cameraRight = cameraTransform.right;
-        Vector3 cameraUp = cameraTransform.up;
 
         cameraForward.y = 0;
         cameraRight.y = 0;
-        cameraUp.x = 0;
-        cameraUp.z = 0;
 
         cameraForward.Normalize();
         cameraRight.Normalize();
-        cameraUp.Normalize();
 
-        Vector3 moveDirection = cameraForward * input.z + cameraRight * input.x + cameraUp * input.y;
+        // 위/아래는 카메라 기울기와 상관없이 항상 월드 기준 위/아래
+        Vector3 moveDirection = cameraForward * input.z + cameraRight * input.x + Vector3.up * input.y;
         moveDirection = Vector3.ClampMagnitude(moveDirection, 1f);
 
-        /*
         bool isRunning = keyboard.leftShiftKey.isPressed;
+        /*
         float currentSpeed = isRunning ? runSpeed : walkSpeed;
         */
         float currentSpeed = walkSpeed;
 
         controller.Move(moveDirection * currentSpeed * Time.deltaTime);
 
-        if (moveDirection.sqrMagnitude > 0.001)
+        // 회전은 수평 방향만 사용 (위/아래로 움직일 때 캐릭터가 기울어지지 않게)
+        Vector3 flatDirection = new Vector3(moveDirection.x, 0f, moveDirection.z);
+
+        if (flatDirection.sqrMagnitude > 0.001f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
+            Quaternion targetRotation = Quaternion.LookRotation(flatDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
 
+        //8. Idle, Walk, Run 애니메이션
+        float animationSpeed = 0f;
 
+        if (moveDirection.sqrMagnitude > 0.001f)
+        {
+            animationSpeed = isRunning ? 1f : 0.5f;
+        }
 
-        controller.Move(Vector3.up * verticalVelocity * Time.deltaTime);
-
+        animator.SetFloat("speed", animationSpeed, 0.1f, Time.deltaTime);
 
         //float animationSpeed = 0f;
 
