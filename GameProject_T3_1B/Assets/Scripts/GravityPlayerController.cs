@@ -20,9 +20,12 @@ public class GravityPlayerController : MonoBehaviour
     [Header("점프 / 중력 설정")]
 
     [SerializeField] private float jumpHeight = 2f;             // 점프 높이 (월드 단위)
-    [SerializeField] private float gravityMultiplier = 2f;      // 중력 배율 (클수록 빨리 떨어진다)
+    [SerializeField] private float gravityMultiplier = 2f;      // 중력 배율 (1 = 기본, 1보다 작으면 우주처럼 둥실, 클수록 빨리 떨어진다)
     [SerializeField] private float groundCheckDistance = 0.15f; // 발 밑 바닥 감지 거리
     [SerializeField] private LayerMask groundLayers = ~0;       // 바닥으로 인식할 레이어 (기본: 전부)
+
+    private static readonly int SpeedHash = Animator.StringToHash("speed");
+    private static readonly int GroundedHash = Animator.StringToHash("isGrounded");
 
     private Rigidbody rb;
     private CapsuleCollider capsule;
@@ -33,6 +36,8 @@ public class GravityPlayerController : MonoBehaviour
     private bool isRunning;
     private bool jumpRequested;
     private bool isGrounded;
+    private bool hasGroundedParam;          // Animator에 isGrounded 파라미터가 있는지
+    private float groundCheckLockTimer;     // 점프 직후 잠깐 바닥 판정을 쉬는 시간
 
     private void Awake()
     {
@@ -52,6 +57,18 @@ public class GravityPlayerController : MonoBehaviour
         if (animator == null)
         {
             Debug.LogError("GravityPlayerController: 자식에서 Animator를 찾지 못했어요! 모델(Astraveler_Hu)이 Player 아래에 있는지 확인해주세요.");
+        }
+        else
+        {
+            // Animator에 isGrounded 파라미터가 있을 때만 값을 보낸다 (없어도 경고가 나지 않게)
+            foreach (AnimatorControllerParameter parameter in animator.parameters)
+            {
+                if (parameter.nameHash == GroundedHash)
+                {
+                    hasGroundedParam = true;
+                    break;
+                }
+            }
         }
 
         if (cameraTransform == null)
@@ -106,15 +123,20 @@ public class GravityPlayerController : MonoBehaviour
         // 점프: 바닥에 있을 때만
         if (jumpRequested && isGrounded)
         {
-            float gravityForce = -Physics.gravity.y * gravityMultiplier;
+            // 중력이 약할수록 같은 높이에 필요한 힘이 줄어든다
+            float gravityForce = Mathf.Max(0.01f, -Physics.gravity.y * gravityMultiplier);
             velocity.y = Mathf.Sqrt(2f * jumpHeight * gravityForce);
+
+            // 점프 직후에는 아직 발이 땅 근처라서 바닥으로 판정되는 걸 막는다
+            isGrounded = false;
+            groundCheckLockTimer = 0.1f;
         }
         jumpRequested = false;
 
         rb.linearVelocity = velocity;
 
-        // 중력을 더 세게 (기본 중력에 추가로 힘을 준다)
-        if (gravityMultiplier > 1f)
+        // 중력 배율 적용: 1보다 크면 더 세게, 1보다 작으면 더 약하게 (우주 느낌)
+        if (!Mathf.Approximately(gravityMultiplier, 1f))
         {
             rb.AddForce(Physics.gravity * (gravityMultiplier - 1f), ForceMode.Acceleration);
         }
@@ -171,6 +193,14 @@ public class GravityPlayerController : MonoBehaviour
 
     private void CheckGround()
     {
+        // 점프 직후에는 잠깐 바닥 판정을 쉰다
+        if (groundCheckLockTimer > 0f)
+        {
+            groundCheckLockTimer -= Time.fixedDeltaTime;
+            isGrounded = false;
+            return;
+        }
+
         // 캡슐 중심에서 아래로 레이를 쏜다 (자기 자신의 콜라이더 안에서 시작하면 자기 자신은 맞지 않는다)
         Bounds bounds = capsule.bounds;
         float distance = bounds.extents.y + groundCheckDistance;
@@ -195,7 +225,13 @@ public class GravityPlayerController : MonoBehaviour
             animationSpeed = isRunning ? 1f : 0.5f;
         }
 
-        animator.SetFloat("speed", animationSpeed, 0.1f, Time.deltaTime);
+        animator.SetFloat(SpeedHash, animationSpeed, 0.1f, Time.deltaTime);
+
+        // 점프 모션: 공중에 있으면 false, 바닥에 있으면 true
+        if (hasGroundedParam)
+        {
+            animator.SetBool(GroundedHash, isGrounded);
+        }
     }
 
     public void ChangeState(PlayerState newState)
