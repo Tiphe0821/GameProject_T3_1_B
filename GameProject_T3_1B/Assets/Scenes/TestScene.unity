@@ -1464,6 +1464,7 @@ MonoBehaviour:
   decreaseAmount: -2
   decreaseFrequency: 0.6
   increaseAmount: 60
+  oxygenItemId: Dummy
 --- !u!54 &601386383
 Rigidbody:
   m_ObjectHideFlags: 0
