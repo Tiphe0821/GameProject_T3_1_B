@@ -68,7 +68,7 @@ namespace GameFramework.Services
         {
             _move.Enable(); _jump.Enable(); _interact.Enable(); _back.Enable();
         }
-            
+
         /// <summary>컷씬 등에서 게임플레이 입력만 차단 (뒤로가기는 유지)</summary>
         public void DisableGameplay()
         {

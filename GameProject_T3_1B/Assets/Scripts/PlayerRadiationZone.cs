@@ -36,7 +36,7 @@ public class PlayerRadiationZone : MonoBehaviour
         if (!isRadiation) return;
         if (lastDecreasedTime + decreaseFrequency < Time.time)
         {
-            PlayerStatus.Instance.ModifyRadiation(-decreaseAmount);
+            PlayerStatus.Instance.ModifyRadiation(decreaseAmount);
             lastDecreasedTime = Time.time;
         }
     }
