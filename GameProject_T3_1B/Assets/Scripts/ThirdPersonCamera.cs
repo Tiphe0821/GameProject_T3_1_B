@@ -43,18 +43,26 @@ public class ThirdPersonCamera : MonoBehaviour
             return;
         }
 
-        Vector2 mouseDelta = mouse.delta.ReadValue();
+        // [변경] 핫바 드래그를 위해 커서가 풀려 있는 동안은 카메라를 돌리지 않는다
+        if (!HotbarUI.IsCursorFree)
+        {
+            Vector2 mouseDelta = mouse.delta.ReadValue();
 
-        yaw += mouseDelta.x * mouseSensitivuty;
-        pitch -= mouseDelta.y * mouseSensitivuty;
-        pitch = Mathf.Clamp(pitch, minVerticalAngle, maxVerticalAngle);
+            yaw += mouseDelta.x * mouseSensitivuty;
+            pitch -= mouseDelta.y * mouseSensitivuty;
+            pitch = Mathf.Clamp(pitch, minVerticalAngle, maxVerticalAngle);
+        }
 
         // 마우스 휠 확대와 축소
+        // [변경] 휠은 핫바 선택에 쓰므로, 줌은 Ctrl을 누른 채로만 한다
+        Keyboard keyboard = Keyboard.current;
+        if (keyboard != null && keyboard.leftCtrlKey.isPressed)
+        {
+            float scroll = mouse.scroll.ReadValue().y;
 
-        float scroll = mouse.scroll.ReadValue().y;
-
-        distance -= scroll * zoomSpeed;
-        distance = Mathf.Clamp(distance, minDistance, maxDistance);
+            distance -= scroll * zoomSpeed;
+            distance = Mathf.Clamp(distance, minDistance, maxDistance);
+        }
     }
 
     private void LateUpdate()
