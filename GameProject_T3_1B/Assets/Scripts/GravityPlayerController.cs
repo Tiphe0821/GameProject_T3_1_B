@@ -35,7 +35,8 @@ public class GravityPlayerController : MonoBehaviour
     private Vector3 moveDirection;
     private bool isRunning;
     private bool jumpRequested;
-    private bool isGrounded;
+    private bool isGrounded;                // 실제 바닥 판정 (점프 가능 여부 확인용)
+    private bool isJumpMotion;              // 점프키로 점프한 상태인지 (점프 모션 재생용)
     private bool hasGroundedParam;          // Animator에 isGrounded 파라미터가 있는지
     private float groundCheckLockTimer;     // 점프 직후 잠깐 바닥 판정을 쉬는 시간
 
@@ -130,6 +131,9 @@ public class GravityPlayerController : MonoBehaviour
             // 점프 직후에는 아직 발이 땅 근처라서 바닥으로 판정되는 걸 막는다
             isGrounded = false;
             groundCheckLockTimer = 0.1f;
+
+            // 점프키로 실제 점프했을 때만 점프 모션을 켠다
+            isJumpMotion = true;
         }
         jumpRequested = false;
 
@@ -211,6 +215,12 @@ public class GravityPlayerController : MonoBehaviour
             distance,
             groundLayers,
             QueryTriggerInteraction.Ignore);
+
+        // 점프 후 착지하면 점프 모션을 끈다
+        if (isGrounded)
+        {
+            isJumpMotion = false;
+        }
     }
 
     private void UpdateAnimation()
@@ -227,10 +237,11 @@ public class GravityPlayerController : MonoBehaviour
 
         animator.SetFloat(SpeedHash, animationSpeed, 0.1f, Time.deltaTime);
 
-        // 점프 모션: 공중에 있으면 false, 바닥에 있으면 true
+        // 점프 모션: 점프키로 점프했을 때만 false(점프 모션), 그 외에는 true(지상 모션)
+        // 언덕/계단/낭떠러지처럼 그냥 공중에 뜬 경우에는 점프 모션이 나오지 않는다
         if (hasGroundedParam)
         {
-            animator.SetBool(GroundedHash, isGrounded);
+            animator.SetBool(GroundedHash, !isJumpMotion);
         }
     }
 
