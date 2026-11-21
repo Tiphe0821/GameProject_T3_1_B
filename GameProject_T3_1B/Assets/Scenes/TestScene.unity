@@ -3906,7 +3906,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b94a98557aa1bb54d82038848893ba19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AgentManager
-  allAgents: []
+  allAgents:
+  - agentName: Engineer
+    agentIcon: {fileID: 1595982907714843850, guid: 05093c347aad8764c8ff05fc33f1221e, type: 3}
+    maxHealth: 0
+    maxOxygen: 0
+    moveSpeed: 0
+  - agentName: Cryptographer
+    agentIcon: {fileID: 5166243855303422729, guid: 0438c89cf661efe4f82ed28e71aacb84, type: 3}
+    maxHealth: 0
+    maxOxygen: 0
+    moveSpeed: 0
+  - agentName: Agent
+    agentIcon: {fileID: 4895802684607180572, guid: 410af906fc8c01543985f55e48f1b03d, type: 3}
+    maxHealth: 0
+    maxOxygen: 0
+    moveSpeed: 0
 --- !u!4 &1785552693
 Transform:
   m_ObjectHideFlags: 0
