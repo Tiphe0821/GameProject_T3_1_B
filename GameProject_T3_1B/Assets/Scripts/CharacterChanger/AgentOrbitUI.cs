@@ -15,6 +15,7 @@ public class AgentOrbitUI : MonoBehaviour
 
     private float currentAngle = 0f;
     private List<int> currentStandbyIndices = new List<int>();
+    private int activeOuterCount = 0;
 
     private void OnEnable()
     {
@@ -23,24 +24,26 @@ public class AgentOrbitUI : MonoBehaviour
 
     private void Update()
     {
-        if (outerIcons == null || outerIcons.Length == 0) return;
+        if (outerIcons == null || outerIcons.Length == 0 || activeOuterCount == 0) return;
 
         currentAngle += orbitSpeed * Time.deltaTime;
-        float angleStep = 360f / outerIcons.Length;
+        float angleStep = 360f / activeOuterCount;
 
         Vector2 centerPos = Vector2.zero;
+        int activeIndex = 0;
 
         for (int i = 0; i < outerIcons.Length; i++)
         {
             if (outerIcons[i] == null || !outerIcons[i].gameObject.activeSelf) continue;
 
-            float angle = currentAngle + (angleStep * i);
+            float angle = currentAngle + (angleStep * activeIndex);
             float rad = angle * Mathf.Deg2Rad;
 
             float x = centerPos.x + Mathf.Cos(rad) * orbitRadius;
             float y = centerPos.y + Mathf.Sin(rad) * orbitRadius;
 
             outerIcons[i].rectTransform.anchoredPosition = new Vector2(x, y);
+            activeIndex++;
         }
     }
 
@@ -49,31 +52,45 @@ public class AgentOrbitUI : MonoBehaviour
         if (AgentManager.Instance == null) return;
 
         AgentData currentAgent = AgentManager.Instance.GetCurrentAgent();
-        if (currentAgent != null)
+        if (currentAgent != null && centerIcon != null)
         {
             centerIcon.sprite = currentAgent.agentIcon;
             centerIcon.gameObject.SetActive(true);
         }
 
         currentStandbyIndices = AgentManager.Instance.GetStandbyAgentIndices();
+        activeOuterCount = Mathf.Min(currentStandbyIndices.Count, outerIcons.Length);
 
         for (int i = 0; i < outerIcons.Length; i++)
         {
-            if (i < currentStandbyIndices.Count)
+            if (i < activeOuterCount)
             {
                 int agentIndex = currentStandbyIndices[i];
                 AgentData standbyData = AgentManager.Instance.allAgents[agentIndex];
 
-                outerIcons[i].sprite = standbyData.agentIcon;
-                outerIcons[i].gameObject.SetActive(true);
+                if (outerIcons[i] != null)
+                {
+                    outerIcons[i].sprite = standbyData.agentIcon;
+                    outerIcons[i].gameObject.SetActive(true);
+                }
 
-                outerButtons[i].onClick.RemoveAllListeners();
-                outerButtons[i].onClick.AddListener(() => OnOuterIconClicked(agentIndex));
+                if (outerButtons != null && i < outerButtons.Length && outerButtons[i] != null)
+                {
+                    outerButtons[i].onClick.RemoveAllListeners();
+                    outerButtons[i].onClick.AddListener(() => OnOuterIconClicked(agentIndex));
+                }
             }
             else
             {
-                outerIcons[i].gameObject.SetActive(false);
-                outerButtons[i].onClick.RemoveAllListeners();
+                if (outerIcons[i] != null)
+                {
+                    outerIcons[i].gameObject.SetActive(false);
+                }
+
+                if (outerButtons != null && i < outerButtons.Length && outerButtons[i] != null)
+                {
+                    outerButtons[i].onClick.RemoveAllListeners();
+                }
             }
         }
     }
