@@ -2427,6 +2427,7 @@ GameObject:
   - component: {fileID: 939517258}
   - component: {fileID: 939517257}
   - component: {fileID: 939517262}
+  - component: {fileID: 939517263}
   m_Layer: 0
   m_Name: TestMonitor
   m_TagString: Untagged
@@ -2573,6 +2574,21 @@ MonoBehaviour:
   - {fileID: 449158711}
   orbitRadius: 250
   orbitSpeed: 30
+--- !u!114 &939517263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 939517256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e07c43b6467b6341be5417288e1909e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MonitorMovement
+  playerTag: Player
+  rotateSpeed: 5
+  minDistance: 0.01
 --- !u!1 &956626513
 GameObject:
   m_ObjectHideFlags: 0
