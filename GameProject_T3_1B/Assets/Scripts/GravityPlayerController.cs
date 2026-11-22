@@ -24,6 +24,12 @@ public class GravityPlayerController : MonoBehaviour
     [SerializeField] private float groundCheckDistance = 0.15f; // 발 밑 바닥 감지 거리
     [SerializeField] private LayerMask groundLayers = ~0;       // 바닥으로 인식할 레이어 (기본: 전부)
 
+    [Header("턱 오르기 설정")]
+
+    [SerializeField] private float stepMaxHeight = 0.4f;        // 올라갈 수 있는 턱 최대 높이
+    [SerializeField] private float stepMinHeight = 0.05f;       // 이보다 낮은 이음새는 무시
+    [SerializeField] private float stepCheckDistance = 0.3f;    // 최소 감지 거리 (속도가 빠르면 자동으로 더 길어진다)
+
     private static readonly int SpeedHash = Animator.StringToHash("speed");
     private static readonly int GroundedHash = Animator.StringToHash("isGrounded");
 
@@ -40,6 +46,8 @@ public class GravityPlayerController : MonoBehaviour
     private bool hasGroundedParam;          // Animator에 isGrounded 파라미터가 있는지
     private float groundCheckLockTimer;     // 점프 직후 잠깐 바닥 판정을 쉬는 시간
 
+    private readonly RaycastHit[] castHits = new RaycastHit[8];
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -50,6 +58,13 @@ public class GravityPlayerController : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeRotation;       // 캐릭터가 넘어지지 않게 회전 고정
         rb.interpolation = RigidbodyInterpolation.Interpolate;      // 움직임을 부드럽게
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+        // 마찰 0: 문턱 모서리에 걸리지 않게
+        PhysicsMaterial noFriction = new PhysicsMaterial("NoFriction");
+        noFriction.dynamicFriction = 0f;
+        noFriction.staticFriction = 0f;
+        noFriction.frictionCombine = PhysicsMaterialCombine.Minimum;
+        capsule.material = noFriction;
 
         // Inspector에 프리팹 원본이 들어가 있어도 문제없도록,
         // 항상 씬에 있는 자식 오브젝트의 Animator를 찾아서 사용한다.
@@ -137,6 +152,12 @@ public class GravityPlayerController : MonoBehaviour
         }
         jumpRequested = false;
 
+        // 점프키로 점프한 게 아니면 위로 가는 속도를 없앤다 (턱에서 튕기는 것 방지)
+        if (!isJumpMotion && velocity.y > 0f)
+        {
+            velocity.y = 0f;
+        }
+
         rb.linearVelocity = velocity;
 
         // 중력 배율 적용: 1보다 크면 더 세게, 1보다 작으면 더 약하게 (우주 느낌)
@@ -144,6 +165,8 @@ public class GravityPlayerController : MonoBehaviour
         {
             rb.AddForce(Physics.gravity * (gravityMultiplier - 1f), ForceMode.Acceleration);
         }
+
+        TryStepUp();
 
         // 회전은 수평 방향만 사용
         Vector3 flatDirection = new Vector3(moveDirection.x, 0f, moveDirection.z);
@@ -153,6 +176,77 @@ public class GravityPlayerController : MonoBehaviour
             Quaternion targetRotation = Quaternion.LookRotation(flatDirection);
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
         }
+    }
+
+    // 앞에 낮은 턱이 있으면 턱 높이를 재서 부딪히기 전에 한 번에 올려준다
+    private void TryStepUp()
+    {
+        if (!isGrounded || isJumpMotion) return;
+
+        Vector3 dir = new Vector3(moveDirection.x, 0f, moveDirection.z);
+        if (dir.sqrMagnitude < 0.001f) return;
+        dir.Normalize();
+
+        Bounds b = capsule.bounds;
+        float feetY = b.min.y;
+        float radius = Mathf.Max(b.extents.x, b.extents.z);
+
+        // 한 번에 움직이는 거리보다 멀리 본다 (속도가 빠를수록 더 멀리)
+        float speed = new Vector2(rb.linearVelocity.x, rb.linearVelocity.z).magnitude;
+        float dist = radius + Mathf.Max(stepCheckDistance, speed * Time.fixedDeltaTime * 1.5f);
+
+        Vector3 low = new Vector3(b.center.x, feetY + stepMinHeight, b.center.z);
+        Vector3 high = new Vector3(b.center.x, feetY + stepMaxHeight, b.center.z);
+
+        RaycastHit lowHit;
+        RaycastHit highHit;
+        RaycastHit topHit;
+
+        // 발 근처는 막혀 있고
+        if (!CastIgnoreSelf(low, dir, dist, out lowHit)) return;
+
+        // 완만한 경사는 그냥 올라가면 되니까 무시
+        if (lowHit.normal.y > 0.7f) return;
+
+        // 최대 높이 위쪽은 비어 있어야 올라갈 수 있는 턱이다
+        if (CastIgnoreSelf(high, dir, dist, out highHit)) return;
+
+        // 턱 윗면 높이 재기: 턱 바로 안쪽 위에서 아래로 쏜다
+        Vector3 topOrigin = lowHit.point + dir * 0.05f;
+        topOrigin.y = feetY + stepMaxHeight;
+
+        if (!CastIgnoreSelf(topOrigin, Vector3.down, stepMaxHeight, out topHit)) return;
+
+        float rise = topHit.point.y - feetY;
+
+        if (rise > stepMinHeight && rise <= stepMaxHeight)
+        {
+            rb.position += Vector3.up * (rise + 0.01f);
+        }
+    }
+
+    // 자기 자신(자식 포함)은 빼고 가장 가까운 것을 찾는다
+    private bool CastIgnoreSelf(Vector3 origin, Vector3 dir, float dist, out RaycastHit nearest)
+    {
+        nearest = default(RaycastHit);
+        bool found = false;
+        float best = float.MaxValue;
+
+        int count = Physics.RaycastNonAlloc(origin, dir, castHits, dist, groundLayers, QueryTriggerInteraction.Ignore);
+
+        for (int i = 0; i < count; i++)
+        {
+            if (castHits[i].collider.transform.IsChildOf(transform)) continue;
+
+            if (castHits[i].distance < best)
+            {
+                best = castHits[i].distance;
+                nearest = castHits[i];
+                found = true;
+            }
+        }
+
+        return found;
     }
 
     private void HandleInput(Keyboard keyboard)
