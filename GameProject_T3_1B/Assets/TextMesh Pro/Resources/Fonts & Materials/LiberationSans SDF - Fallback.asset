@@ -172,24 +172,24 @@ MonoBehaviour:
     m_FaceIndex: 0
     m_FamilyName: Liberation Sans
     m_StyleName: Regular
-    m_PointSize: 86
+    m_PointSize: 60
     m_Scale: 1
     m_UnitsPerEM: 2048
-    m_LineHeight: 98.8916
-    m_AscentLine: 77.853516
-    m_CapLine: 59
-    m_MeanLine: 45
+    m_LineHeight: 68.99414
+    m_AscentLine: 54.316402
+    m_CapLine: 41
+    m_MeanLine: 32
     m_Baseline: 0
-    m_DescentLine: -18.22461
-    m_SuperscriptOffset: 77.853516
+    m_DescentLine: -12.714843
+    m_SuperscriptOffset: 54.316402
     m_SuperscriptSize: 0.5
-    m_SubscriptOffset: -18.22461
+    m_SubscriptOffset: -12.714843
     m_SubscriptSize: 0.5
-    m_UnderlineOffset: -12.261719
-    m_UnderlineThickness: 6.298828
-    m_StrikethroughOffset: 18
-    m_StrikethroughThickness: 6.298828
-    m_TabWidth: 24
+    m_UnderlineOffset: -8.5546875
+    m_UnderlineThickness: 4.3945312
+    m_StrikethroughOffset: 12.8
+    m_StrikethroughThickness: 4.3945312
+    m_TabWidth: 17
   m_Material: {fileID: 2180264}
   m_SourceFontFileGUID: e3265ab4bf004d28a9537516768c1c75
   m_CreationSettings:
@@ -197,7 +197,7 @@ MonoBehaviour:
     sourceFontFileGUID: e3265ab4bf004d28a9537516768c1c75
     faceIndex: 0
     pointSizeSamplingMode: 0
-    pointSize: 86
+    pointSize: 60
     padding: 9
     paddingMode: 0
     packingMode: 4

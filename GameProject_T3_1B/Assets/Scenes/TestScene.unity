@@ -1529,7 +1529,7 @@ CapsuleCollider:
   m_Radius: 1.3
   m_Height: 6
   m_Direction: 1
-  m_Center: {x: 0, y: 1.91, z: 0.83}
+  m_Center: {x: 0, y: 1.91, z: 0}
 --- !u!4 &601386381
 Transform:
   m_ObjectHideFlags: 0
@@ -1605,13 +1605,16 @@ MonoBehaviour:
   cameraTransform: {fileID: 956626516}
   walkSpeed: 20
   runSpeed: 25
-  rotationSpeed: 10
+  rotationSpeed: 20
   jumpHeight: 2
   gravityMultiplier: 2
   groundCheckDistance: 0.15
   groundLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+  stepMaxHeight: 0.4
+  stepMinHeight: 0.05
+  stepCheckDistance: 0.3
 --- !u!1001 &640376960
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2572,8 +2575,9 @@ MonoBehaviour:
   - {fileID: 905458553}
   - {fileID: 1535000325}
   - {fileID: 449158711}
-  orbitRadius: 250
-  orbitSpeed: 30
+  targetRadius: 250
+  targetOrbitSpeed: 40
+  openDuration: 2
 --- !u!114 &939517263
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2697,12 +2701,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonCamera
   target: {fileID: 601386381}
   distance: 7
-  height: 1.5
+  height: 2.5
   mouseSensitivuty: 0.12
-  minVerticalAngle: -30
-  maxVerticalAngle: 60
+  minVerticalAngle: -20
+  maxVerticalAngle: 80
   zoomSpeed: 0.01
-  minDistance: 2
+  minDistance: 2.5
   maxDistance: 10
 --- !u!114 &956626518
 MonoBehaviour:
@@ -3987,11 +3991,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -6601043233671942095, guid: 96f0dbb2cd19ef8488dfcb41235ba93c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.24
+      value: -1.15
       objectReference: {fileID: 0}
     - target: {fileID: -6601043233671942095, guid: 96f0dbb2cd19ef8488dfcb41235ba93c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.79
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -6601043233671942095, guid: 96f0dbb2cd19ef8488dfcb41235ba93c, type: 3}
       propertyPath: m_LocalRotation.w
