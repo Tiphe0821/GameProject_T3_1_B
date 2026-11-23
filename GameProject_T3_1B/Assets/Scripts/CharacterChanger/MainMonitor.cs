@@ -5,8 +5,9 @@ public class MainMonitor : MonoBehaviour
     [Header("UI 세팅")]
     [SerializeField] private GameObject monitorPanel;
     [SerializeField] private float interactiveDistance = 5.0f;
-     
+
     private Transform playerTransform;
+    private AgentOrbitUI orbitUI;
 
     private void Start()
     {
@@ -14,6 +15,11 @@ public class MainMonitor : MonoBehaviour
 
         if (monitorPanel != null)
         {
+            orbitUI = monitorPanel.GetComponentInChildren<AgentOrbitUI>(true);
+            if (orbitUI == null)
+            {
+                orbitUI = monitorPanel.GetComponentInParent<AgentOrbitUI>();
+            }
             monitorPanel.SetActive(false);
         }
     }
@@ -33,6 +39,10 @@ public class MainMonitor : MonoBehaviour
             if (monitorPanel != null && !monitorPanel.activeSelf)
             {
                 monitorPanel.SetActive(true);
+                if (orbitUI != null)
+                {
+                    orbitUI.StartOpenAnimation();
+                }
             }
         }
         else
