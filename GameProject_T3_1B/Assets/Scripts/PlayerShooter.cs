@@ -19,6 +19,7 @@ public class PlayerShooter : MonoBehaviour
 
     public void OnAttack(InputValue value)
     {
+        if (HotbarUI.IsBlockingGameplayClick) return;   // [추가] 핫바를 클릭하거나 드래그하는 동안은 공격하지 않는다
         if (playerMelee.canMeleeAttack) return;
         if (Time.timeScale == 0f) return;
         if (Time.time < lastFireTime + fireCooldown) return;
@@ -30,4 +31,3 @@ public class PlayerShooter : MonoBehaviour
         rb.linearVelocity = firePoint.forward * bulletSpeed;
     }
 }
-

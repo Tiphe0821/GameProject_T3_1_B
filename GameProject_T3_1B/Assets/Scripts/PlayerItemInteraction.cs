@@ -57,6 +57,7 @@ public class PlayerItemInteraction : MonoBehaviour
         {
             if (col.GetComponentInParent<PickupItem>() != null) return true;
             if (col.GetComponentInParent<Door>() != null) return true;
+            if (col.GetComponentInParent<CraftingStation>() != null) return true;   // [추가] 제작대 근처에서는 아이템을 사용하지 않는다
         }
 
         return false;

@@ -21,6 +21,10 @@ public class HotbarUI : MonoBehaviour
     [SerializeField] private Key cursorUnlockKey = Key.LeftAlt;
 
     public static bool IsCursorFree { get; private set; }     // 커서가 풀려 있는 동안 true (카메라가 확인한다)
+    public static bool IsPointerOverUI { get; private set; }  // 마우스가 UI 위에 있는 동안 true
+
+    // 공격 스크립트가 확인한다: 핫바를 조작하는 클릭이면 공격하지 않는다
+    public static bool IsBlockingGameplayClick => IsCursorFree || IsPointerOverUI;
 
     private HotbarSlotUI[] slotUIs;
 
@@ -47,6 +51,7 @@ public class HotbarUI : MonoBehaviour
     private void OnDisable()
     {
         IsCursorFree = false;
+        IsPointerOverUI = false;
     }
 
     private void Update()
@@ -67,6 +72,9 @@ public class HotbarUI : MonoBehaviour
     // 드래그를 하려면 커서가 보여야 하므로, 지정한 키를 누르는 동안 커서를 풀어 준다
     private void LateUpdate()
     {
+        // 마우스가 UI 위에 있는지 매 프레임 기록해 둔다 (입력 콜백 안에서 직접 확인하면 오류가 나므로)
+        IsPointerOverUI = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
+
         if (!useCursorUnlockKey) return;
 
         Keyboard keyboard = Keyboard.current;
@@ -142,7 +150,7 @@ public class HotbarUI : MonoBehaviour
                 TextAlignmentOptions.BottomRight, new Vector2(0.4f, 0f), new Vector2(0.97f, 0.3f));
             TextMeshProUGUI numberText = CreateText(slotGo.transform, "Number", font, 12f,
                 TextAlignmentOptions.TopLeft, new Vector2(0.05f, 0.75f), new Vector2(0.4f, 0.98f));
-            numberText.text = i < 9 ? (i + 1).ToString() : "";
+            numberText.text = (i + 1 <= 9) ? (i + 1).ToString() : "";
 
             HotbarSlotUI slot = slotGo.GetComponent<HotbarSlotUI>();
             slot.Init(hotbar, i, canvas, background, nameText, countText);

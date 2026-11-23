@@ -15,6 +15,7 @@ public class PlayerMelee : MonoBehaviour
 
     public void OnAttack(InputValue inputValue)
     {
+        if (HotbarUI.IsBlockingGameplayClick) return;   // [추가] 핫바를 클릭하거나 드래그하는 동안은 공격하지 않는다
         if (!canMeleeAttack) return;
         if (Time.timeScale == 0f) return;
         if (Time.time < lastAttackTime + attackCooldown) return;
@@ -31,18 +32,19 @@ public class PlayerMelee : MonoBehaviour
         Keyboard keyboard = Keyboard.current;
         if (keyboard == null) return;
 
-        if(keyboard.digit1Key.wasPressedThisFrame)
+        // [변경] 숫자키 1~9는 핫바가 쓰므로, 무기 전환 키를 Z(원거리) / X(근접)로 옮김
+        if (keyboard.zKey.wasPressedThisFrame)
         {
             canMeleeAttack = false;
         }
-        else if(keyboard.digit2Key.wasPressedThisFrame)
+        else if (keyboard.xKey.wasPressedThisFrame)
         {
             canMeleeAttack = true;
         }
 
-        if(meleeAttackRange == null) return;
+        if (meleeAttackRange == null) return;
 
-        if(Time.time > lastAttackTime + fadeTime)
+        if (Time.time > lastAttackTime + fadeTime)
         {
             meleeAttackRange.gameObject.SetActive(false);
         }

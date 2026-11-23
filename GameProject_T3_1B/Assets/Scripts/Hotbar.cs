@@ -60,9 +60,13 @@ public class Hotbar : MonoBehaviour
 
     public void SwapSlots(int a, int b)
     {
-        if (a < 0 || b < 0 || a >= slotCount || b >= slotCount || a == b) return;
+        if (a == b) return;
+        if (a < 0 || b < 0) return;
+        if (a >= slotCount || b >= slotCount) return;
 
-        (slots[a], slots[b]) = (slots[b], slots[a]);
+        string temp = slots[a];
+        slots[a] = slots[b];
+        slots[b] = temp;
 
         RefreshHeldItem();              // 들고 있던 칸이 바뀌었으면 손에 든 아이템도 갱신
         OnHotbarChanged?.Invoke();
@@ -93,9 +97,16 @@ public class Hotbar : MonoBehaviour
         if (mouse == null) return;
 
         float scroll = mouse.scroll.ReadValue().y;
+        if (Mathf.Approximately(scroll, 0f)) return;
 
-        if (scroll < 0f) SelectSlot(selectedIndex + 1);          // 휠 아래로: 다음 칸 (마인크래프트 방식)
-        else if (scroll > 0f) SelectSlot(selectedIndex - 1);     // 휠 위로: 이전 칸
+        if (scroll > 0f)
+        {
+            SelectSlot(selectedIndex - 1);                       // 휠 위로: 이전 칸
+        }
+        else
+        {
+            SelectSlot(selectedIndex + 1);                       // 휠 아래로: 다음 칸 (마인크래프트 방식)
+        }
     }
 
     // ===================== 들고 있는 아이템 갱신 =====================
@@ -153,14 +164,18 @@ public class Hotbar : MonoBehaviour
     private bool IsInHotbar(string itemId)
     {
         for (int i = 0; i < slots.Length; i++)
+        {
             if (slots[i] == itemId) return true;
+        }
         return false;
     }
 
     private int FindEmptySlot()
     {
         for (int i = 0; i < slots.Length; i++)
+        {
             if (string.IsNullOrEmpty(slots[i])) return i;
+        }
         return -1;
     }
 }
