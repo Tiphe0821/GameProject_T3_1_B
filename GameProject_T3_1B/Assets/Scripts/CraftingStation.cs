@@ -10,6 +10,14 @@ public class CraftingStation : MonoBehaviour
     {
         public string itemId;
         public int amount = 1;
+
+        public Ingredient() { }                                  // 인스펙터용 기본 생성자
+
+        public Ingredient(string itemId, int amount)             // 코드에서 편하게 만들기 위한 생성자
+        {
+            this.itemId = itemId;
+            this.amount = amount;
+        }
     }
 
     [Header("제작 레시피 (재료)")]
@@ -18,6 +26,88 @@ public class CraftingStation : MonoBehaviour
     [Header("결과물")]
     [SerializeField] private string resultItemId = "";
     [SerializeField] private int resultAmount = 1;
+
+    // ===================== 레시피 읽기 (UI 등에서 현재 레시피를 확인할 때) =====================
+
+    public IReadOnlyList<Ingredient> Ingredients => ingredients;
+    public string ResultItemId => resultItemId;
+    public int ResultAmount => resultAmount;
+
+    // ===================== 레시피 변경 =====================
+
+    // 레시피 전체를 한 번에 바꾼다 (기존 재료는 모두 지워진다)
+    // 사용 예)
+    //   station.SetRecipe("tool", 1,
+    //       new CraftingStation.Ingredient("iron", 2),
+    //       new CraftingStation.Ingredient("wood", 1));
+    public void SetRecipe(string newResultItemId, int newResultAmount, params Ingredient[] newIngredients)
+    {
+        SetResult(newResultItemId, newResultAmount);
+
+        ingredients.Clear();
+
+        if (newIngredients == null) return;
+
+        foreach (Ingredient ingredient in newIngredients)
+        {
+            if (ingredient == null) continue;
+            AddIngredient(ingredient.itemId, ingredient.amount);
+        }
+    }
+
+    // 결과물만 바꾼다
+    public void SetResult(string newResultItemId, int newResultAmount)
+    {
+        resultItemId = newResultItemId;
+        resultAmount = newResultAmount;
+    }
+
+    // 재료를 하나 추가한다 (이미 있는 재료면 개수만 늘린다)
+    public void AddIngredient(string itemId, int amount)
+    {
+        if (string.IsNullOrEmpty(itemId) || amount <= 0) return;
+
+        foreach (Ingredient existing in ingredients)
+        {
+            if (existing.itemId == itemId)
+            {
+                existing.amount += amount;
+                return;
+            }
+        }
+
+        ingredients.Add(new Ingredient(itemId, amount));
+    }
+
+    // 특정 재료의 개수를 바꾼다. 개수가 0 이하면 그 재료를 레시피에서 뺀다
+    public void SetIngredientAmount(string itemId, int amount)
+    {
+        for (int i = 0; i < ingredients.Count; i++)
+        {
+            if (ingredients[i].itemId != itemId) continue;
+
+            if (amount <= 0) ingredients.RemoveAt(i);
+            else ingredients[i].amount = amount;
+            return;
+        }
+
+        // 레시피에 없던 재료라면 새로 추가한다
+        if (amount > 0) ingredients.Add(new Ingredient(itemId, amount));
+    }
+
+    // 특정 재료를 레시피에서 뺀다
+    public void RemoveIngredient(string itemId)
+    {
+        ingredients.RemoveAll(ingredient => ingredient.itemId == itemId);
+    }
+
+    // 재료를 전부 지운다
+    public void ClearIngredients()
+    {
+        ingredients.Clear();
+    }
+
+    // ===================== 제작 =====================
 
     // 제작에 성공하면 true
     public bool TryCraft()
